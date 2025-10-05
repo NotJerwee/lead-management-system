@@ -39,6 +39,7 @@ class Lead(models.Model):
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
     deleted_at = models.DateTimeField(null=True, blank=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='leads')
     
     class Meta:
         ordering = ['-created_at']

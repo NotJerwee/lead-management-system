@@ -19,8 +19,8 @@ class LeadViewSet(viewsets.ModelViewSet):
     ordering = ['-created_at']
     
     def get_queryset(self):
-        """Return non-deleted leads"""
-        return Lead.objects.filter(is_deleted=False)
+        """Return non-deleted leads for current user"""
+        return Lead.objects.filter(is_deleted=False, created_by=self.request.user)
     
     def get_serializer_class(self):
         """Return serializer based on action"""
@@ -29,6 +29,10 @@ class LeadViewSet(viewsets.ModelViewSet):
         elif self.action == 'create':
             return LeadCreateSerializer
         return LeadSerializer
+
+    def perform_create(self, serializer):
+        """Set created_by to current user on lead creation"""
+        serializer.save(created_by=self.request.user)
     
     def destroy(self, request, *args, **kwargs):
         """Soft delete lead."""
@@ -58,18 +62,23 @@ class LeadViewSet(viewsets.ModelViewSet):
         """Get analytics data for dashboard"""
         from django.db.models import Count
         
-        total_leads = Lead.objects.filter(is_deleted=False).count()
+        total_leads = Lead.objects.filter(is_deleted=False, created_by=request.user).count()
         
-        leads_by_status = Lead.objects.filter(is_deleted=False).values('status').annotate(count=Count('id'))
+        leads_by_status = (
+            Lead.objects.filter(is_deleted=False, created_by=request.user)
+            .values('status')
+            .annotate(count=Count('id'))
+        )
         status_data = {item['status']: item['count'] for item in leads_by_status}
         
         recent_activities = Activity.objects.filter(
-            lead__is_deleted=False
+            lead__is_deleted=False,
+            lead__created_by=request.user,
         ).select_related('lead', 'created_by').order_by('-created_at')[:10]
         
-        qualified_leads = Lead.objects.filter(is_deleted=False, status='qualified').count()
-        closed_leads = Lead.objects.filter(is_deleted=False, status='closed').count()
-        lost_leads = Lead.objects.filter(is_deleted=False, status='lost').count()
+        qualified_leads = Lead.objects.filter(is_deleted=False, status='qualified', created_by=request.user).count()
+        closed_leads = Lead.objects.filter(is_deleted=False, status='closed', created_by=request.user).count()
+        lost_leads = Lead.objects.filter(is_deleted=False, status='lost', created_by=request.user).count()
         
         conversion_rate = (closed_leads / total_leads * 100) if total_leads > 0 else 0
         qualification_rate = (qualified_leads / total_leads * 100) if total_leads > 0 else 0
@@ -99,8 +108,8 @@ class ActivityViewSet(viewsets.ModelViewSet):
     ordering = ['-date', '-created_at']
     
     def get_queryset(self):
-        """Return activities for non-deleted leads"""
-        return Activity.objects.filter(lead__is_deleted=False)
+        """Return activities for non-deleted leads belonging to current user"""
+        return Activity.objects.filter(lead__is_deleted=False, lead__created_by=self.request.user)
     
     def get_serializer_class(self):
         """Return serializer based on action"""
@@ -127,24 +136,24 @@ def dashboard(request):
     """Dashboard metrics endpoint."""
     from django.db.models import Count
 
-    total_leads = Lead.objects.filter(is_deleted=False).count()
+    total_leads = Lead.objects.filter(is_deleted=False, created_by=request.user).count()
 
     leads_by_status = (
-        Lead.objects.filter(is_deleted=False)
+        Lead.objects.filter(is_deleted=False, created_by=request.user)
         .values('status')
         .annotate(count=Count('id'))
     )
     status_data = {item['status']: item['count'] for item in leads_by_status}
 
     recent_activities = (
-        Activity.objects.filter(lead__is_deleted=False)
+        Activity.objects.filter(lead__is_deleted=False, lead__created_by=request.user)
         .select_related('lead', 'created_by')
         .order_by('-created_at')[:10]
     )
 
-    qualified_leads = Lead.objects.filter(is_deleted=False, status='qualified').count()
-    closed_leads = Lead.objects.filter(is_deleted=False, status='closed').count()
-    lost_leads = Lead.objects.filter(is_deleted=False, status='lost').count()
+    qualified_leads = Lead.objects.filter(is_deleted=False, status='qualified', created_by=request.user).count()
+    closed_leads = Lead.objects.filter(is_deleted=False, status='closed', created_by=request.user).count()
+    lost_leads = Lead.objects.filter(is_deleted=False, status='lost', created_by=request.user).count()
 
     total_leads_safe = total_leads if total_leads > 0 else 0
     conversion_rate = (closed_leads / total_leads * 100) if total_leads > 0 else 0
