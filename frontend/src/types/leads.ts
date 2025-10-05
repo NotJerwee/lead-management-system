@@ -9,9 +9,12 @@ export interface Lead {
 	budget_max: number;
 	budget_range: string;
 	status: LeadStatus;
+    source: LeadSource;
+    property_interest?: string;
 	created_at: string;
 	updated_at: string;
-	is_deleted: boolean;
+    is_deleted: boolean;
+    is_active: boolean;
 	activities?: Activity[];
 }
 
@@ -22,14 +25,18 @@ export interface CreateLeadData {
 	phone: string;
 	budget_min: number;
 	budget_max: number;
-	status: LeadStatus;
+    status: LeadStatus;
+    source: LeadSource;
+    property_interest?: string;
 }
 
 export interface UpdateLeadData extends Partial<CreateLeadData> {
   	id: number;
 }
 
-export type LeadStatus = 'new' | 'contacted' | 'qualified' | 'closed' | 'lost';
+export type LeadStatus = 'new' | 'contacted' | 'qualified' | 'negotiation' | 'closed' | 'lost';
+
+export type LeadSource = 'website' | 'referral' | 'zillow' | 'other';
 
 export interface LeadFilters {
 	status?: LeadStatus;
@@ -49,8 +56,16 @@ export const LEAD_STATUS_OPTIONS = [
 	{ value: 'new', label: 'New' },
 	{ value: 'contacted', label: 'Contacted' },
 	{ value: 'qualified', label: 'Qualified' },
+    { value: 'negotiation', label: 'Negotiation' },
 	{ value: 'closed', label: 'Closed' },
 	{ value: 'lost', label: 'Lost' },
+] as const;
+
+export const LEAD_SOURCE_OPTIONS = [
+    { value: 'website', label: 'Website' },
+    { value: 'referral', label: 'Referral' },
+    { value: 'zillow', label: 'Zillow' },
+    { value: 'other', label: 'Other' },
 ] as const;
 
 export interface Activity {
@@ -61,9 +76,9 @@ export interface Activity {
 	activity_type_display: string;
 	title: string;
 	notes: string;
-	date: string;
-	duration_minutes?: number;
-	created_by: number;
+    activity_date: string;
+    duration?: number;
+    created_by: number; // API also exposes `user` alias
 	created_at: string;
 	updated_at: string;
 }
@@ -73,8 +88,8 @@ export interface CreateActivityData {
 	activity_type: ActivityType;
 	title: string;
 	notes?: string;
-	date: string;
-	duration_minutes?: number;
+    activity_date: string;
+    duration?: number;
 }
 
 export interface UpdateActivityData extends Partial<CreateActivityData> {

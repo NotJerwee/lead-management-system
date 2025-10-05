@@ -5,15 +5,17 @@ class LeadSerializer(serializers.ModelSerializer):
     """Serializer for Lead model"""
     full_name = serializers.ReadOnlyField()
     budget_range = serializers.ReadOnlyField()
+    is_active = serializers.BooleanField(read_only=True)
     
     class Meta:
         model = Lead
         fields = [
             'id', 'first_name', 'last_name', 'full_name', 'email', 'phone',
-            'budget_min', 'budget_max', 'budget_range', 'status',
-            'created_at', 'updated_at', 'is_deleted', 'deleted_at'
+            'budget_min', 'budget_max', 'budget_range', 'status', 'source',
+            'property_interest', 'created_at', 'updated_at', 'is_active',
+            'is_deleted', 'deleted_at'
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at', 'is_deleted', 'deleted_at']
+        read_only_fields = ['id', 'created_at', 'updated_at', 'is_active', 'is_deleted', 'deleted_at']
     
     def validate(self, data):
         """Validate budget range"""
@@ -34,7 +36,7 @@ class LeadCreateSerializer(serializers.ModelSerializer):
         model = Lead
         fields = [
             'first_name', 'last_name', 'email', 'phone',
-            'budget_min', 'budget_max', 'status'
+            'budget_min', 'budget_max', 'status', 'source', 'property_interest'
         ]
 
 class LeadListSerializer(serializers.ModelSerializer):
@@ -55,15 +57,19 @@ class ActivitySerializer(serializers.ModelSerializer):
     created_by_name = serializers.SerializerMethodField()
     lead_name = serializers.SerializerMethodField()
     activity_type_display = serializers.CharField(source='get_activity_type_display', read_only=True)
+    # Spec field aliases
+    user = serializers.PrimaryKeyRelatedField(source='created_by', read_only=True)
+    activity_date = serializers.DateTimeField(source='date')
+    duration = serializers.IntegerField(source='duration_minutes', allow_null=True, required=False)
     
     class Meta:
         model = Activity
         fields = [
             'id', 'lead', 'lead_name', 'activity_type', 'activity_type_display', 'title', 'notes',
-            'date', 'duration_minutes', 'created_by', 'created_by_name',
+            'activity_date', 'duration', 'created_by', 'user', 'created_by_name',
             'created_at', 'updated_at'
         ]
-        read_only_fields = ['id', 'created_by', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_by', 'user', 'created_at', 'updated_at']
     
     def get_created_by_name(self, obj):
         """Get the username of the user who created the activity"""
@@ -106,11 +112,14 @@ class ActivitySerializer(serializers.ModelSerializer):
 
 class ActivityCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating new activities"""
+    # Accept spec field names while mapping to model fields
+    activity_date = serializers.DateTimeField(source='date', required=True)
+    duration = serializers.IntegerField(source='duration_minutes', allow_null=True, required=False)
     
     class Meta:
         model = Activity
         fields = [
-            'lead', 'activity_type', 'title', 'notes', 'date', 'duration_minutes'
+            'lead', 'activity_type', 'title', 'notes', 'activity_date', 'duration'
         ]
     
     def validate(self, data):
@@ -147,7 +156,7 @@ class LeadDetailSerializer(serializers.ModelSerializer):
         model = Lead
         fields = [
             'id', 'first_name', 'last_name', 'full_name', 'email', 'phone',
-            'budget_min', 'budget_max', 'budget_range', 'status',
-            'created_at', 'updated_at', 'activities'
+            'budget_min', 'budget_max', 'budget_range', 'status', 'source',
+            'property_interest', 'is_active', 'created_at', 'updated_at', 'activities'
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'is_active', 'created_at', 'updated_at']

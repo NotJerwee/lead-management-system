@@ -2,8 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { leadService } from '../services/leadService';
-import type { LeadStatus } from '../types/leads';
-import { LEAD_STATUS_OPTIONS } from '../types/leads';
+import type { LeadStatus, LeadSource } from '../types/leads';
+import { LEAD_STATUS_OPTIONS, LEAD_SOURCE_OPTIONS } from '../types/leads';
 
 interface LeadFormData {
 	first_name: string;
@@ -13,6 +13,8 @@ interface LeadFormData {
 	budget_min: number;
 	budget_max: number;
 	status: LeadStatus;
+    source: LeadSource;
+    property_interest?: string;
 }
 
 const LeadFormPage: React.FC = () => {
@@ -32,7 +34,9 @@ const LeadFormPage: React.FC = () => {
 			phone: '',
 			budget_min: 0,
 			budget_max: 0,
-			status: 'new',
+            status: 'new',
+            source: 'other',
+            property_interest: '',
 		},
 	});
 
@@ -183,6 +187,22 @@ const LeadFormPage: React.FC = () => {
 
 					<div>
 					<div className="grid grid-cols-1 gap-4">
+                        <div>
+                        <label htmlFor="source" className="block text-sm font-medium text-gray-700 mb-2">
+                            Source
+                        </label>
+                        <select
+                            id="source"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            {...register('source')}
+                        >
+                            {LEAD_SOURCE_OPTIONS.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                            ))}
+                        </select>
+                        </div>
 						<div>
 						<label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-2">
 							Status
@@ -199,6 +219,17 @@ const LeadFormPage: React.FC = () => {
 							))}
 						</select>
 						</div>
+                        <div>
+                        <label htmlFor="property_interest" className="block text-sm font-medium text-gray-700 mb-2">
+                            Property Interest
+                        </label>
+                        <textarea
+                            id="property_interest"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            rows={3}
+                            {...register('property_interest')}
+                        />
+                        </div>
 					</div>
 					</div>
 

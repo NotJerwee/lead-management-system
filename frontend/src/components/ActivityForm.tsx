@@ -22,14 +22,14 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
 	onSubmit,
 	initialData
 }) => {
-	const [formData, setFormData] = useState<CreateActivityData>({
-		lead: leadId,
-		activity_type: initialData?.activity_type || 'note',
-		title: initialData?.title || '',
-		notes: initialData?.notes || '',
-		date: initialData?.date || new Date().toISOString().slice(0, 16),
-		duration_minutes: initialData?.duration_minutes || undefined,
-	});
+    const [formData, setFormData] = useState<CreateActivityData>({
+        lead: leadId,
+        activity_type: initialData?.activity_type || 'note',
+        title: initialData?.title || '',
+        notes: initialData?.notes || '',
+        activity_date: (initialData as any)?.activity_date || (initialData as any)?.date || new Date().toISOString().slice(0, 16),
+        duration: (initialData as any)?.duration ?? (initialData as any)?.duration_minutes ?? undefined,
+    });
 
 	const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -40,12 +40,12 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
       newErrors.title = 'Title is required';
     }
 
-    if (formData.activity_type === 'call' && !formData.date) {
+    if (formData.activity_type === 'call' && !formData.activity_date) {
       newErrors.date = 'Date is required for calls';
     }
 
     if (formData.activity_type === 'call') {
-      if (!formData.duration_minutes || formData.duration_minutes <= 0) {
+      if (!formData.duration || formData.duration <= 0) {
         newErrors.duration_minutes = 'Duration is required for calls';
       }
     }
@@ -112,8 +112,8 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
 				</label>
 				<input
 					type="datetime-local"
-					value={formData.date}
-					onChange={(e) => handleChange('date', e.target.value)}
+					value={formData.activity_date}
+					onChange={(e) => handleChange('activity_date', e.target.value)}
 					className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
 					errors.date ? 'border-red-500' : 'border-gray-300'
 					}`}
@@ -130,36 +130,36 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
 				<input
 					type="number"
 					min="1"
-					value={formData.duration_minutes || ''}
-					onChange={(e) => handleChange('duration_minutes', e.target.value ? Number(e.target.value) : undefined)}
+					value={formData.duration || ''}
+					onChange={(e) => handleChange('duration', e.target.value ? Number(e.target.value) : undefined)}
 					className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
 					errors.duration_minutes ? 'border-red-500' : 'border-gray-300'
 					}`}
-					placeholder="Enter duration in minutes"
-				/>
-				<ErrorMessage error={errors.duration_minutes} />
+						placeholder="Enter duration in minutes"
+					/>
+					<ErrorMessage error={errors.duration_minutes} />
 				</div>
 			)}
 
 			<div>
 				<label className="block text-sm font-medium text-gray-700 mb-1">
-				Notes
+					Notes
 				</label>
 				<textarea
-				value={formData.notes}
-				onChange={(e) => handleChange('notes', e.target.value)}
-				rows={4}
-				className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-				placeholder="Enter activity notes..."
+					value={formData.notes}
+					onChange={(e) => handleChange('notes', e.target.value)}
+					rows={4}
+					className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+					placeholder="Enter activity notes"
 				/>
 			</div>
 
 			<div className="pt-4">
 				<button
-				type="submit"
-				className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+					type="submit"
+					className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
 				>
-				{initialData ? 'Update Activity' : 'Add Activity'}
+					{initialData ? 'Update Activity' : 'Add Activity'}
 				</button>
 			</div>
 		</form>

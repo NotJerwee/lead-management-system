@@ -60,7 +60,7 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({
 	return (
 		<div className="space-y-4">
 		{activities.map((activity, index) => {
-			const { date } = formatDate(activity.date);
+            const { date } = formatDate(activity.activity_date);
 
 			return (
 				<div key={activity.id || `activity-${index}`} className="relative">
@@ -87,10 +87,10 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({
 								</div>
 							</div>
 
-							{activity.activity_type === 'call' && (
+                            {activity.activity_type === 'call' && (
 								<div className="mb-2">
 								<span className="text-xs text-gray-500">
-									{date} • {formatDuration(activity.duration_minutes || 0)}
+                                    {date} • {formatDuration(activity.duration || 0)}
 								</span>
 								</div>
 							)}
@@ -121,17 +121,17 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({
 						X
 					</button>
 					</div>
-					<ActivityForm
-					leadId={editingActivity.lead}
-					onSubmit={handleUpdateActivity}
-					initialData={{
-						activity_type: editingActivity.activity_type,
-						title: editingActivity.title,
-						notes: editingActivity.notes,
-						date: editingActivity.date.slice(0, 16),
-						duration_minutes: editingActivity.duration_minutes,
-					}}
-					/>
+                    <ActivityForm
+                    leadId={editingActivity.lead}
+                    onSubmit={handleUpdateActivity}
+                    initialData={{
+                        activity_type: editingActivity.activity_type,
+                        title: editingActivity.title,
+                        notes: editingActivity.notes,
+                        activity_date: editingActivity.activity_date.slice(0, 16),
+                        duration: editingActivity.duration,
+                    } as any}
+                    />
 				</div>
 			</div>
 		)}

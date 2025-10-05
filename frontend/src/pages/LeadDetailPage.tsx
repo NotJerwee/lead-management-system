@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import type { Lead, Activity, CreateActivityData } from '../types/leads';
-import { LEAD_STATUS_OPTIONS } from '../types/leads';
+import { LEAD_STATUS_OPTIONS, LEAD_SOURCE_OPTIONS } from '../types/leads';
 import { leadService } from '../services/leadService';
 import { activityService } from '../services/activityService';
 import ActivityForm from '../components/ActivityForm';
@@ -34,14 +34,16 @@ const LeadDetailPage: React.FC = () => {
 	const [showActivityForm, setShowActivityForm] = useState(false);
 	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 	const [isEditing, setIsEditing] = useState(false);
-	const [editForm, setEditForm] = useState({
+    const [editForm, setEditForm] = useState({
 		first_name: '',
 		last_name: '',
 		email: '',
 		phone: '',
 		budget_min: 0,
 		budget_max: 0,
-		status: 'new' as any,
+        status: 'new' as any,
+        source: 'other' as any,
+        property_interest: '',
 	});
 
 	useEffect(() => {
@@ -55,14 +57,16 @@ const LeadDetailPage: React.FC = () => {
 			setLoading(true);
 			const leadData = await leadService.getLead(Number(id));
 			setLead(leadData);
-			setEditForm({
+            setEditForm({
 				first_name: leadData.first_name,
 				last_name: leadData.last_name,
 				email: leadData.email,
 				phone: leadData.phone,
 				budget_min: leadData.budget_min,
 				budget_max: leadData.budget_max,
-				status: leadData.status,
+                status: leadData.status,
+                source: (leadData as any).source || 'other',
+                property_interest: (leadData as any).property_interest || '',
 			});
 			
 			const activitiesData = await activityService.getActivities(leadData.id);
@@ -197,7 +201,7 @@ const LeadDetailPage: React.FC = () => {
 
 						{isEditing ? (
 							<div className="space-y-4">
-							<div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-4">
 								<div>
 								<label className="block text-sm font-medium text-gray-700 mb-1">
 									First Name
@@ -271,7 +275,7 @@ const LeadDetailPage: React.FC = () => {
 									</div>
 								</div>
 							
-								<div>
+                                <div>
 									<label className="block text-sm font-medium text-gray-700 mb-1">
 										Status
 									</label>
@@ -287,6 +291,35 @@ const LeadDetailPage: React.FC = () => {
 									))}
 									</select>
 								</div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Source
+                                    </label>
+                                    <select
+                                        value={editForm.source}
+                                        onChange={(e) => setEditForm(prev => ({ ...prev, source: e.target.value as any }))}
+                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    >
+                                    {LEAD_SOURCE_OPTIONS.map(option => (
+                                        <option key={option.value} value={option.value}>
+                                            {option.label}
+                                        </option>
+                                    ))}
+                                    </select>
+                                </div>
+
+                                <div className="col-span-2">
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Property Interest
+                                    </label>
+                                    <textarea
+                                        value={editForm.property_interest}
+                                        onChange={(e) => setEditForm(prev => ({ ...prev, property_interest: e.target.value }))}
+                                        rows={3}
+                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                </div>
 							
 								<div className="flex space-x-3">
 									<button
@@ -304,7 +337,7 @@ const LeadDetailPage: React.FC = () => {
 								</div>
 							</div>
 						) : (
-							<div className="space-y-4">
+                            <div className="space-y-4">
 								<div>
 									<label className="text-sm font-medium text-gray-500">Email</label>
 									<p className="text-gray-900">{lead.email}</p>
@@ -313,6 +346,16 @@ const LeadDetailPage: React.FC = () => {
 									<label className="text-sm font-medium text-gray-500">Phone</label>
 									<p className="text-gray-900">{lead.phone}</p>
 								</div>
+                                <div>
+                                    <label className="text-sm font-medium text-gray-500">Source</label>
+                                    <p className="text-gray-900">{LEAD_SOURCE_OPTIONS.find(s => s.value === (lead as any).source)?.label || (lead as any).source}</p>
+                                </div>
+                                {Boolean((lead as any).property_interest) && (
+                                    <div>
+                                        <label className="text-sm font-medium text-gray-500">Property Interest</label>
+                                        <p className="text-gray-900 whitespace-pre-wrap">{(lead as any).property_interest}</p>
+                                    </div>
+                                )}
 								<div>
 									<label className="text-sm font-medium text-gray-500">Budget Range</label>
 									<p className="text-gray-900">{lead.budget_range}</p>

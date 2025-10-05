@@ -11,8 +11,15 @@ class Lead(models.Model):
         ('new', 'New'),
         ('contacted', 'Contacted'),
         ('qualified', 'Qualified'),
+        ('negotiation', 'Negotiation'),
         ('closed', 'Closed'),
         ('lost', 'Lost'),
+    ]
+    SOURCE_CHOICES = [
+        ('website', 'Website'),
+        ('referral', 'Referral'),
+        ('zillow', 'Zillow'),
+        ('other', 'Other'),
     ]
     
     first_name = models.CharField()
@@ -24,9 +31,12 @@ class Lead(models.Model):
     budget_max = models.DecimalField(max_digits=12, decimal_places=2)
     
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new')
+    source = models.CharField(max_length=50, choices=SOURCE_CHOICES, default='other')
+    property_interest = models.TextField(blank=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
     deleted_at = models.DateTimeField(null=True, blank=True)
     
@@ -35,6 +45,13 @@ class Lead(models.Model):
         indexes = [
             models.Index(fields=['status']),
             models.Index(fields=['is_deleted']),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['email'],
+                condition=models.Q(is_active=True),
+                name='unique_active_lead_email',
+            ),
         ]
     
     def __str__(self):
@@ -53,6 +70,7 @@ class Lead(models.Model):
     def soft_delete(self):
         """Soft delete the lead"""
         self.is_deleted = True
+        self.is_active = False
         self.deleted_at = timezone.now()
         self.save()
 
