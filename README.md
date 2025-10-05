@@ -1,73 +1,67 @@
-# React + TypeScript + Vite
+## Lead Management System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+### Project description
+Lead tracking CRM with authentication, leads, activities, and an analytics dashboard. Users can register/login, create/update leads, log activities (calls, emails, meetings, notes), and view summary analytics.
 
-Currently, two official plugins are available:
+### Tech stack used
+- Frontend: React, TypeScript, Vite, Tailwind, Axios, Recharts
+- Backend: Django, Python, JWT, CORS
+- DB: PostgreSQL
+- Hosting: Vercel (frontend), Render (backend)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Setup instructions
+1) Backend
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
+```
+Backend check at `http://localhost:8000/`.
 
-## React Compiler
+2) Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
+App runs at `http://localhost:5173`.
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+### Environment variables
+1) Backend
+```
+SECRET_KEY=change-me
+DEBUG=True
 
-## Expanding the ESLint configuration
+DB_ENGINE=django.db.backends.postgresql
+DB_NAME=lead_management_db
+DB_USER=lead_user
+DB_PASSWORD=lead_password
+DB_HOST=localhost
+DB_PORT=5432
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+SIMPLE_JWT_ACCESS_MINUTES=60
+SIMPLE_JWT_REFRESH_DAYS=7
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+CORS_ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+CORS_ALLOW_CREDENTIALS=True
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+2) Frontend
 ```
+VITE_API_URL=http://localhost:8000/api
+```
+
+### Deployment URLs
+- Frontend (Vercel): `https://lead-management-system-lime.vercel.app`
+- Backend (Render): `https://lead-management-system-8hd6.onrender.com`
+
+### Test credentials for demo
+Use this account to sign in:
+- Username: `tester`
+- Password: `test12345`
+
+### Time spent on the project
+- ~ 15 hours
