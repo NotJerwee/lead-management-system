@@ -12,7 +12,6 @@ export interface Lead {
 	created_at: string;
 	updated_at: string;
 	is_deleted: boolean;
-	deleted_at?: string;
 	activities?: Activity[];
 }
 
@@ -57,6 +56,7 @@ export const LEAD_STATUS_OPTIONS = [
 export interface Activity {
 	id: number;
 	lead: number;
+	lead_name: string;
 	activity_type: ActivityType;
 	activity_type_display: string;
 	title: string;
@@ -64,7 +64,6 @@ export interface Activity {
 	date: string;
 	duration_minutes?: number;
 	created_by: number;
-	created_by_name: string;
 	created_at: string;
 	updated_at: string;
 }
@@ -90,3 +89,17 @@ export const ACTIVITY_TYPE_OPTIONS = [
 	{ value: 'meeting', label: 'Meeting' },
 	{ value: 'note', label: 'Note' },
 ] as const;
+
+export interface ConversionMetrics {
+	conversion_rate: number;
+	qualification_rate: number;
+	lost_rate: number;
+	total_leads: number;
+}
+
+export interface AnalyticsData {
+	total_leads: number;
+	leads_by_status: Record<string, number>;
+	recent_activities: Activity[];
+	conversion_metrics: ConversionMetrics;
+}

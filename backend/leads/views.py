@@ -3,15 +3,11 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
-from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
 from .models import Lead, Activity
 from .serializers import (
     LeadSerializer, LeadCreateSerializer, LeadDetailSerializer,
     ActivitySerializer, ActivityCreateSerializer
 )
-
-User = get_user_model()
 
 class LeadViewSet(viewsets.ModelViewSet):
     """ViewSet for Lead CRUD operations"""
@@ -41,13 +37,42 @@ class LeadViewSet(viewsets.ModelViewSet):
         lead.soft_delete()
         return Response({'message': 'Lead deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
     
-    @action(detail=True, methods=['post'])
-    def restore(self, request, pk=None):
-        """Restore a soft deleted lead"""
-        lead = get_object_or_404(Lead, pk=pk, is_deleted=True)
-        lead.restore()
-        serializer = self.get_serializer(lead)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    @action(detail=False, methods=['get'])
+    def analytics(self, request):
+        """Get analytics data for dashboard"""
+        from django.db.models import Count
+        
+        total_leads = Lead.objects.filter(is_deleted=False).count()
+        
+        leads_by_status = Lead.objects.filter(is_deleted=False).values('status').annotate(count=Count('id'))
+        status_data = {item['status']: item['count'] for item in leads_by_status}
+        
+        recent_activities = Activity.objects.filter(
+            lead__is_deleted=False
+        ).select_related('lead', 'created_by').order_by('-created_at')[:10]
+        
+        qualified_leads = Lead.objects.filter(is_deleted=False, status='qualified').count()
+        closed_leads = Lead.objects.filter(is_deleted=False, status='closed').count()
+        lost_leads = Lead.objects.filter(is_deleted=False, status='lost').count()
+        
+        conversion_rate = (closed_leads / total_leads * 100) if total_leads > 0 else 0
+        qualification_rate = (qualified_leads / total_leads * 100) if total_leads > 0 else 0
+        lost_rate = (lost_leads / total_leads * 100) if total_leads > 0 else 0
+        
+        return Response({
+            'total_leads': total_leads,
+            'leads_by_status': status_data,
+            'recent_activities': ActivitySerializer(recent_activities, many=True).data,
+            'conversion_metrics': {
+                'conversion_rate': round(conversion_rate, 1),
+                'qualification_rate': round(qualification_rate, 1),
+                'lost_rate': round(lost_rate, 1),
+                'total_leads': total_leads,
+                'qualified_leads': qualified_leads,
+                'closed_leads': closed_leads,
+                'lost_leads': lost_leads
+            }
+        })
 
 class ActivityViewSet(viewsets.ModelViewSet):
     """ViewSet for Activity CRUD operations"""

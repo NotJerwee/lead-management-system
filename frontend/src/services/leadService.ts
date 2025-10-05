@@ -3,7 +3,8 @@ import type {
 	Lead, 
 	CreateLeadData, 
 	LeadFilters, 
-	LeadListResponse 
+	LeadListResponse,
+	AnalyticsData
 } from '../types/leads';
 
 const API_BASE_URL = 'http://localhost:8000/api';
@@ -83,8 +84,8 @@ export const leadService = {
 		await api.delete(`/leads/${id}/soft_delete/`);
 	},
 
-	async restoreLead(id: number): Promise<Lead> {
-		const response = await api.post(`/leads/${id}/restore/`);
+	async getAnalytics(): Promise<AnalyticsData> {
+		const response = await api.get('/leads/analytics/');
 		return response.data;
 	},
 };

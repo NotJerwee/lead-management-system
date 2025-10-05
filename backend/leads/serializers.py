@@ -52,17 +52,33 @@ class LeadListSerializer(serializers.ModelSerializer):
 
 class ActivitySerializer(serializers.ModelSerializer):
     """Serializer for Activity model"""
-    created_by_name = serializers.CharField(source='created_by.get_full_name', read_only=True)
+    created_by_name = serializers.SerializerMethodField()
+    lead_name = serializers.SerializerMethodField()
     activity_type_display = serializers.CharField(source='get_activity_type_display', read_only=True)
     
     class Meta:
         model = Activity
         fields = [
-            'id', 'lead', 'activity_type', 'activity_type_display', 'title', 'notes',
+            'id', 'lead', 'lead_name', 'activity_type', 'activity_type_display', 'title', 'notes',
             'date', 'duration_minutes', 'created_by', 'created_by_name',
             'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_by', 'created_at', 'updated_at']
+    
+    def get_created_by_name(self, obj):
+        """Get the username of the user who created the activity"""
+        if obj.created_by:
+            full_name = obj.created_by.get_full_name()
+            if full_name.strip() and full_name.strip() not in ['User Name', 'First Last', '']:
+                return full_name
+            return obj.created_by.username
+        return "Unknown User"
+    
+    def get_lead_name(self, obj):
+        """Get the name of the lead associated with the activity"""
+        if obj.lead:
+            return obj.lead.full_name
+        return "Unknown Lead"
     
     def validate(self, data):
         """Validate activity data"""
