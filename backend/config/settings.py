@@ -89,7 +89,6 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# Prefer DATABASE_URL; fallback to individual DB_* vars
 db_url = config('DATABASE_URL', default='')
 if db_url:
     DATABASES = {

@@ -154,8 +154,8 @@ const AnalyticsDashboard: React.FC = () => {
 									</div>
 									<p className="text-xs text-gray-600 truncate">
 										{activity.lead_name} • {activity.activity_type_display}
-										{activity.activity_type === 'call' && activity.duration_minutes && (
-											<span> • {formatDuration(activity.duration_minutes)}</span>
+										{activity.activity_type === 'call' && activity.duration && (
+											<span> • {formatDuration(activity.duration)}</span>
 										)}
 									</p>
 									{activity.notes && (
