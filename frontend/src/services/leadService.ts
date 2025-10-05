@@ -81,11 +81,11 @@ export const leadService = {
 	},
 
 	async softDeleteLead(id: number): Promise<void> {
-		await api.delete(`/leads/${id}/soft_delete/`);
+		await api.delete(`/leads/${id}/`);
 	},
 
 	async getAnalytics(): Promise<AnalyticsData> {
-		const response = await api.get('/leads/analytics/');
+		const response = await api.get('/dashboard/');
 		return response.data;
 	},
 };
