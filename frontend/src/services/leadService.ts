@@ -68,4 +68,23 @@ export const leadService = {
 		const response = await api.post('/leads/', data);
 		return response.data;
 	},
+
+	async getLead(id: number): Promise<Lead> {
+		const response = await api.get(`/leads/${id}/`);
+		return response.data;
+	},
+
+	async updateLead(id: number, data: Partial<CreateLeadData>): Promise<Lead> {
+		const response = await api.patch(`/leads/${id}/`, data);
+		return response.data;
+	},
+
+	async softDeleteLead(id: number): Promise<void> {
+		await api.delete(`/leads/${id}/soft_delete/`);
+	},
+
+	async restoreLead(id: number): Promise<Lead> {
+		const response = await api.post(`/leads/${id}/restore/`);
+		return response.data;
+	},
 };

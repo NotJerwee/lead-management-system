@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import type { Lead } from '../types/leads';
 import Pagination from './Pagination';
 
@@ -115,9 +116,12 @@ const LeadsTable: React.FC<LeadsTableProps> = ({
 					{leads.map((lead) => (
 					<tr key={lead.id} className="hover:bg-gray-50">
 						<td className="px-6 py-4 whitespace-nowrap">
-							<div className="text-sm font-medium text-gray-900">
+							<Link 
+								to={`/leads/${lead.id}`}
+								className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
+							>
 								{lead.full_name}
-							</div>
+							</Link>
 						</td>
 						<td className="px-6 py-4 whitespace-nowrap">
 							<div className="text-sm text-gray-900">{lead.email}</div>

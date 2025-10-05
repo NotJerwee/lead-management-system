@@ -10,6 +10,10 @@ export interface Lead {
 	budget_range: string;
 	status: LeadStatus;
 	created_at: string;
+	updated_at: string;
+	is_deleted: boolean;
+	deleted_at?: string;
+	activities?: Activity[];
 }
 
 export interface CreateLeadData {
@@ -43,9 +47,46 @@ export interface LeadListResponse {
 }
 
 export const LEAD_STATUS_OPTIONS = [
-	{ value: 'new', label: 'New', color: 'bg-blue-100 text-blue-800' },
-	{ value: 'contacted', label: 'Contacted', color: 'bg-yellow-100 text-yellow-800' },
-	{ value: 'qualified', label: 'Qualified', color: 'bg-green-100 text-green-800' },
-	{ value: 'closed', label: 'Closed', color: 'bg-purple-100 text-purple-800' },
-	{ value: 'lost', label: 'Lost', color: 'bg-red-100 text-red-800' },
+	{ value: 'new', label: 'New' },
+	{ value: 'contacted', label: 'Contacted' },
+	{ value: 'qualified', label: 'Qualified' },
+	{ value: 'closed', label: 'Closed' },
+	{ value: 'lost', label: 'Lost' },
+] as const;
+
+export interface Activity {
+	id: number;
+	lead: number;
+	activity_type: ActivityType;
+	activity_type_display: string;
+	title: string;
+	notes: string;
+	date: string;
+	duration_minutes?: number;
+	created_by: number;
+	created_by_name: string;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface CreateActivityData {
+	lead: number;
+	activity_type: ActivityType;
+	title: string;
+	notes?: string;
+	date: string;
+	duration_minutes?: number;
+}
+
+export interface UpdateActivityData extends Partial<CreateActivityData> {
+	id: number;
+}
+
+export type ActivityType = 'call' | 'email' | 'meeting' | 'note';
+
+export const ACTIVITY_TYPE_OPTIONS = [
+	{ value: 'call', label: 'Call' },
+	{ value: 'email', label: 'Email' },
+	{ value: 'meeting', label: 'Meeting' },
+	{ value: 'note', label: 'Note' },
 ] as const;

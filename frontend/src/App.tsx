@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import Dashboard from './pages/Dashboard';
 import LeadFormPage from './pages/LeadFormPage';
+import LeadDetailPage from './pages/LeadDetailPage';
 
 function App() {
 	return (
@@ -26,6 +27,14 @@ function App() {
 					element={
 					<ProtectedRoute>
 						<LeadFormPage />
+					</ProtectedRoute>
+					}
+				/>
+				<Route
+					path="/leads/:id"
+					element={
+					<ProtectedRoute>
+						<LeadDetailPage />
 					</ProtectedRoute>
 					}
 				/>
