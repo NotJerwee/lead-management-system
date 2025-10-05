@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "https://lead-management-system-8hd6.onrender.com/api/$1" },
+    { "source": "/((?!api/|.*\\..*).*)", "destination": "/index.html" }
+  ]
+}
