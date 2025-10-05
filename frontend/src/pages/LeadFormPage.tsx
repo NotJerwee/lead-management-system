@@ -26,6 +26,7 @@ const LeadFormPage: React.FC = () => {
 		register,
 		handleSubmit,
 		formState: { errors },
+		getValues,
 	} = useForm<LeadFormData>({
 		defaultValues: {
 			first_name: '',
@@ -56,9 +57,13 @@ const LeadFormPage: React.FC = () => {
 		},
 		budgetMax: {
 			required: 'Maximum budget is required',
-			min: { value: 0, message: 'Budget must be positive' }
+			min: { value: 0, message: 'Budget must be positive' },
+			validate: (value: number) => {
+				const minVal = Number(getValues('budget_min'));
+				return value >= minVal || 'Maximum budget must be greater than or equal to minimum';
+			}
 		}
-	}), []);
+	}), [getValues]);
 
 	const onSubmit = async (data: LeadFormData) => {
 		try {
