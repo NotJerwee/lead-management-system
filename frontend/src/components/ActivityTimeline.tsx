@@ -59,11 +59,11 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({
 
 	return (
 		<div className="space-y-4">
-		{activities.map((activity) => {
+		{activities.map((activity, index) => {
 			const { date } = formatDate(activity.date);
 
 			return (
-				<div key={activity.id} className="relative">
+				<div key={activity.id || `activity-${index}`} className="relative">
 					<div className="flex items-start">
 						<div className="flex-1 min-w-0">
 							<div className="bg-gray-50 rounded-lg p-4">
