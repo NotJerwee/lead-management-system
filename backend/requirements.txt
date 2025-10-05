@@ -7,3 +7,4 @@ psycopg[binary]==3.2.10
 python-decouple==3.8
 setuptools>=68
 dj-database-url==2.2.0
+gunicorn==21.2.0
